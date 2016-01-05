@@ -47,6 +47,31 @@ app.delete('/todos/:id', function (req, res) {
        res.status(400).json({ "error": "No todo found with the ID " + todoId } );
      }
 });
+
+app.put('/todos/:id', function (req, res) {
+     // Find the todo with the given ID.
+     var todoId = parseInt(req.params.id);
+     var matchedTodo = _.findWhere(todos, { id: todoId})
+     if (!matchedTodo) {
+       return res.status(404).json({ "error": "No todo found with the ID " + todoId } );
+     }
+     // Validate request body
+     var body = _.pick(req.body, 'description', 'completed');
+     var validAttributes = {};
+     if (body.hasOwnProperty('completed') && _.isBoolean(body.completed)) {
+       validAttributes.completed = body.completed;
+     } else if (body.hasOwnProperty('completed')) {
+       return res.status(400).json( { "error": "The propery 'completed' must be a boolean." });
+  
+     } 
+     if (body.hasOwnProperty('description') && _.isString(body.description) && body.description.trim().length > 0) {
+         validAttributes.description = body.description;
+     } else if (body.hasOwnProperty('description')) {
+         return res.status(400).json( { "error": "The propery 'description' must be a string." });
+     }
+      _.extend(matchedTodo, validAttributes);
+     res.status(200).json(matchedTodo); 
+});
 app.listen(PORT, function(){
   console.log("Express is listening on port " + PORT + "!");
 });
