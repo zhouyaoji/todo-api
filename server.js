@@ -55,7 +55,7 @@ app.get('/todos/:id', function(req, res) {
 app.post('/todos', function(req, res) {
   var body = _.pick(req.body, 'description', 'completed');
   db.todo.create(body).then(function (todo) {
-     res.json(todo.toJSON());
+     res.status(200).json(todo.toJSON());
     }, function (e) {
       res.status(400).json(e);
   });
@@ -78,19 +78,6 @@ app.delete('/todos/:id', function(req, res) {
       res.status(500).send();
   });
 }); 
-  /*
-  var matchedTodo = _.findWhere(todos, {
-    id: todoId
-  })
-  if (matchedTodo) {
-    todos = _.without(todos, matchedTodo);
-    res.status(200).send("The todo with the ID " + todoId.toString() + " has been deleted. Here it is again:\n" + JSON.stringify(matchedTodo));
-  } else {
-    res.status(400).json({
-      "error": "No todo found with the ID " + todoId
-    });
-  }
-  */
 
 app.put('/todos/:id', function(req, res) {
   // Find the todo with the given ID.
@@ -118,7 +105,14 @@ app.put('/todos/:id', function(req, res) {
       res.status(500).send();
   });
 });
-
+app.post('/users', function(req, res) {
+  var body = _.pick(req.body, 'email', 'password');
+  db.user.create(body).then(function (user) {
+     res.status(200).json(user.toJSON());
+    }, function (e) {
+      res.status(400).json(e);
+  });
+});
 db.sequelize.sync().then(function() {
    app.listen(PORT, function() {
       console.log("Express is listening on port " + PORT + "!");
