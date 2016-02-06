@@ -59,6 +59,12 @@ app.post('/todos', middleware.requireAuthentication, function(req, res) {
   var body = _.pick(req.body, 'description', 'completed');
   db.todo.create(body).then(function (todo) {
      res.status(200).json(todo.toJSON());
+     req.user.addTodo(todo).then(function () {
+        return todo.reload();
+
+     }).then(function (todo) {
+       res.status(200).json(todo.toJSON());
+     });
     }, function (e) {
       res.status(400).json(e);
   });
@@ -109,7 +115,7 @@ app.put('/todos/:id', middleware.requireAuthentication, function(req, res) {
   });
 });
 app.post('/users', function(req, res) {
-  var body = _.pick(req.body, 'email', 'password');
+  var body = _.pick(req.body, 'email', 'password', 'userId');
   db.user.create(body).then(function (user) {
      res.status(200).json(user.toPublicJSON());
     }, function (e) {
